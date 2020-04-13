@@ -14,3 +14,4 @@ node_modules/
 # Файлы сборки (допишите самостоятельно)
 public/bandle.js
 public/bandle.js.map
+
