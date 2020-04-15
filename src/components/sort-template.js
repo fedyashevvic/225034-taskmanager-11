@@ -1,13 +1,32 @@
-export const returnSortTemplate = () => {
+import {createElement} from "./utils.js";
+
+const returnSortTemplate = () => {
   return (
-    `<section class="board container">
-      <div class="board__filter-list">
+    `<div class="board__filter-list">
         <a href="#" class="board__filter" data-sort-type="default">SORT BY DEFAULT</a>
         <a href="#" class="board__filter" data-sort-type="date-up">SORT BY DATE up</a>
         <a href="#" class="board__filter" data-sort-type="date-down">SORT BY DATE down</a>
       </div>
 
-      <div class="board__tasks"></div>
-    </section>`
+      <div class="board__tasks"></div>`
   );
 };
+
+export default class Sort {
+  constructor(task) {
+    this._task = task;
+    this._element = null;
+  }
+  getTemplate() {
+    return returnSortTemplate(this._task);
+  }
+  getElement() {
+    if (!this._element) {
+      return createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+  removeElement() {
+    this._element = null;
+  }
+}

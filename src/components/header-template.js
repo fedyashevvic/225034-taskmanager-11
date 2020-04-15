@@ -1,4 +1,6 @@
-export const returnHeaderTemplate = () => {
+import {createElement} from "./utils.js";
+
+const returnHeaderTemplate = () => {
   return (
     `<section class="control__btn-wrap">
       <input
@@ -30,3 +32,22 @@ export const returnHeaderTemplate = () => {
     </section>`
   );
 };
+
+export default class Header {
+  constructor(task) {
+    this._task = task;
+    this._element = null;
+  }
+  getTemplate() {
+    return returnHeaderTemplate(this._task);
+  }
+  getElement() {
+    if (!this._element) {
+      return createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+  removeElement() {
+    this._element = null;
+  }
+}
