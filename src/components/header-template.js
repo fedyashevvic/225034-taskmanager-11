@@ -34,12 +34,11 @@ const returnHeaderTemplate = () => {
 };
 
 export default class Header {
-  constructor(task) {
-    this._task = task;
+  constructor() {
     this._element = null;
   }
   getTemplate() {
-    return returnHeaderTemplate(this._task);
+    return returnHeaderTemplate();
   }
   getElement() {
     if (!this._element) {

@@ -7,12 +7,11 @@ const returnTasksBoardTemplate = () => {
 };
 
 export default class TaskBoard {
-  constructor(task) {
-    this._task = task;
+  constructor() {
     this._element = null;
   }
   getTemplate() {
-    return returnTasksBoardTemplate(this._task);
+    return returnTasksBoardTemplate();
   }
   getElement() {
     if (!this._element) {

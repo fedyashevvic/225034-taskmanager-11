@@ -21,8 +21,7 @@ const renderTask = (taskListElement, task) => {
 const renderBoard = (boardComponent, tasks) => {
   const boardElement = boardComponent.getElement();
 
-  render(siteMenuElement, new Header().getElement());
-  render(siteMainElement, new Filter().getElement());
+
   render(siteMainElement, boardElement);
   render(boardElement, new Sort().getElement());
   render(boardElement, new TaskBoard().getElement());
@@ -31,26 +30,27 @@ const renderBoard = (boardComponent, tasks) => {
   tasks.slice(0, NUMBER_ON_START_TASKS)
     .forEach((task) => renderTask(taskListElement, task));
 
-  render(boardElement, new MoreButton().getElement());
+  const loadMoreButton = new MoreButton();
 
-  const loadMoreButton = boardElement.querySelector(`.load-more`);
-  const siteBoardTasksElement = boardElement.querySelector(`.board__tasks`);
-
-  loadMoreButton.addEventListener(`click`, () => {
+  render(boardElement, loadMoreButton.getElement());
+  loadMoreButton.getElement().addEventListener(`click`, () => {
     let lastShownTasks = shownTasks;
     shownTasks = shownTasks + NUMBER_OF_NEXT_TASKS;
 
     temprData.slice(lastShownTasks, shownTasks)
-      .forEach((task) => renderTask(siteBoardTasksElement, task));
+      .forEach((task) => renderTask(taskListElement, task));
 
     if (shownTasks >= temprData.length) {
-      loadMoreButton.remove();
+      loadMoreButton.removeElement();
     }
   });
 };
 
 const siteMainElement = document.querySelector(`.main`);
 const siteMenuElement = siteMainElement.querySelector(`.main__control`);
+
+render(siteMenuElement, new Header().getElement());
+render(siteMainElement, new Filter().getElement());
 
 const siteBoardElement = new Board();
 renderBoard(siteBoardElement, temprData);

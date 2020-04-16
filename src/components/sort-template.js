@@ -13,12 +13,11 @@ const returnSortTemplate = () => {
 };
 
 export default class Sort {
-  constructor(task) {
-    this._task = task;
+  constructor() {
     this._element = null;
   }
   getTemplate() {
-    return returnSortTemplate(this._task);
+    return returnSortTemplate();
   }
   getElement() {
     if (!this._element) {

@@ -39,12 +39,11 @@ export const returnFiltersTemplate = () => {
 };
 
 export default class Filter {
-  constructor(task) {
-    this._task = task;
+  constructor() {
     this._element = null;
   }
   getTemplate() {
-    return returnFiltersTemplate(this._task);
+    return returnFiltersTemplate();
   }
   getElement() {
     if (!this._element) {
