@@ -14,5 +14,9 @@ const MONTH_NAMES = [
 ];
 const WEEK_DAYS = [`mo`, `tu`, `we`, `th`, `fr`, `sa`, `su`];
 const TEMPLATE_COLORS = [`black`, `yellow`, `blue`, `green`, `pink`];
+const RenderPosition = {
+  AFTERBEGIN: `afterbegin`,
+  BEFOREEND: `beforeend`
+};
 
-export {MONTH_NAMES, WEEK_DAYS, TEMPLATE_COLORS};
+export {MONTH_NAMES, WEEK_DAYS, TEMPLATE_COLORS, RenderPosition};

@@ -1,3 +1,5 @@
+import {createElement} from "./utils.js";
+
 const filters = {
   titles: [`All`, `Overdue`, `Today`, `Favorites`, `Repeating`, `Archive`],
   returnCount: () => {
@@ -35,3 +37,22 @@ export const returnFiltersTemplate = () => {
     </section>`
   );
 };
+
+export default class Filter {
+  constructor() {
+    this._element = null;
+  }
+  getTemplate() {
+    return returnFiltersTemplate();
+  }
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+  removeElement() {
+    this._element = null;
+  }
+}
+
