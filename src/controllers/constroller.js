@@ -48,8 +48,8 @@ export default class ControllerComponent {
 
       };
 
-      taskComponent.addClickEvt(taskToEditHandler);
-      taskEditComponent.addClickEvt(editToTaskHandler);
+      taskComponent.addClickEvtToSelector(taskToEditHandler, `card__btn--edit`);
+      taskEditComponent.addClickEvtToSelector(editToTaskHandler, `card__save`);
     };
 
     const renderBoard = (boardComponent, tasks) => {
