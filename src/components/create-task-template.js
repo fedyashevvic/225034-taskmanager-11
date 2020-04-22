@@ -1,5 +1,6 @@
 import {MONTH_NAMES, WEEK_DAYS, TEMPLATE_COLORS} from "./const.js";
-import {formatTime, createElement} from "./utils.js";
+import {formatTime} from "./utils.js";
+import AbstractComponent from "./abstract-component.js";
 
 const returnWeekdaysTemplate = (day, isRepeat) => {
   return (
@@ -134,22 +135,12 @@ const returnCreateTaskTemplate = (task) => {
   );
 };
 
-
-export default class TaskEdit {
+export default class TaskEdit extends AbstractComponent {
   constructor(task) {
+    super();
     this._task = task;
-    this._element = null;
   }
   getTemplate() {
     return returnCreateTaskTemplate(this._task);
-  }
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-  removeElement() {
-    this._element = null;
   }
 }

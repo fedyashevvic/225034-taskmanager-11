@@ -12,7 +12,7 @@ const generateMoki = () => {
   };
 };
 
-for (let i = 0; i < 0; i++) {
+for (let i = 0; i < 20; i++) {
   temprData.push(generateMoki());
 }
 

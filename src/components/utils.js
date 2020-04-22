@@ -18,7 +18,8 @@ const createElement = (template) => {
   return newElement.firstChild;
 };
 
-const render = (container, element, place = RenderPosition.BEFOREEND) => {
+const render = (container, component, place = RenderPosition.BEFOREEND) => {
+  const element = component.getElement();
   const {AFTERBEGIN, BEFOREEND} = RenderPosition;
 
   switch (place) {
