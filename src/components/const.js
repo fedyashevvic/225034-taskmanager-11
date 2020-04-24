@@ -18,5 +18,10 @@ const RenderPosition = {
   AFTERBEGIN: `afterbegin`,
   BEFOREEND: `beforeend`
 };
+const SortType = {
+  DEFAULT: `default`,
+  DATEUP: `date-up`,
+  DATEDOWN: `date-down`
+};
 
-export {MONTH_NAMES, WEEK_DAYS, TEMPLATE_COLORS, RenderPosition};
+export {MONTH_NAMES, WEEK_DAYS, TEMPLATE_COLORS, RenderPosition, SortType};
