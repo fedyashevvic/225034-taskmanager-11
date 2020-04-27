@@ -2,14 +2,12 @@ import Header from "../components/header-template.js";
 import Sort from "../components/sort-template.js";
 import Filter from "../components/filters-template.js";
 import TaskBoard from "../components/board-tasks-template.js";
-import Task from "../components/task-template.js";
-import TaskEdit from "../components/create-task-template.js";
 import MoreButton from "../components/load-more-template.js";
 import NoTask from "../components/no-task-template.js";
 import {temprData} from "../components/temprData.js";
-import {Key} from "../components/utils.js";
-import {render, replace} from "../components/render.js";
+import {render} from "../components/render.js";
 import {SortType} from "../components/const.js";
+import TaskController from "./task-controller.js";
 
 
 const getSortedTasks = (tasks, sortType) => {
@@ -41,93 +39,65 @@ export default class ControllerComponent {
     this._header = new Header();
     this._loadMoreBotton = new MoreButton();
     this._taskBoard = new TaskBoard();
+    this._taskController = new TaskController();
+    this._NUMBER_ON_START_TASKS = 8;
+    this._NUMBER_OF_NEXT_TASKS = 8;
+    this._shownTasks = this._NUMBER_ON_START_TASKS;
+    this._siteMainElement = document.querySelector(`.main`);
+    this._siteMenuElement = this._siteMainElement.querySelector(`.main__control`);
   }
-  render() {
-    const NUMBER_ON_START_TASKS = 8;
-    const NUMBER_OF_NEXT_TASKS = 8;
-    let shownTasks = NUMBER_ON_START_TASKS;
+  renderApp() {
+    render(this._siteMenuElement, this._header);
+    render(this._siteMainElement, this._filter);
+
+    this.renderBoard(this._container, temprData);
+  }
 
 
-    const renderTask = (taskListElement, task) => {
-      const taskComponent = new Task(task);
-      const taskEditComponent = new TaskEdit(task);
+  renderBoard(boardComponent, tasks) {
+    const boardElement = boardComponent.getElement();
 
-      render(taskListElement, taskComponent);
+    render(this._siteMainElement, boardComponent);
 
-      const taskToEditHandler = () => {
-        replace(taskListElement, taskEditComponent, taskComponent);
-        const closeOnEsc = (evt) => {
-          if (evt.key === Key.ESC) {
-            editToTaskHandler();
-            window.removeEventListener(`keydown`, closeOnEsc);
-          }
-        };
-        window.addEventListener(`keydown`, closeOnEsc);
-      };
-      const editToTaskHandler = () => {
-        replace(taskListElement, taskComponent, taskEditComponent);
+    if (!tasks.length) {
+      render(boardElement, this._noTask);
+    } else {
+      render(boardElement, this._sort);
+      render(boardElement, this._taskBoard);
 
-      };
+      const taskListElement = boardElement.querySelector(`.board__tasks`);
 
-      taskComponent.addClickEvtToSelector(taskToEditHandler, `card__btn--edit`);
-      taskEditComponent.addClickEvtToSelector(editToTaskHandler, `card__save`);
-    };
+      temprData.slice(0, this._NUMBER_ON_START_TASKS)
+        .forEach((task) => this._taskController.renderTask(taskListElement, task));
 
-    const renderBoard = (boardComponent, tasks) => {
-      const boardElement = boardComponent.getElement();
+      this.renderLoadMoreButton(boardElement, tasks, taskListElement);
 
-      const renderLoadMoreButton = (taskListElement) => {
-        render(boardElement, this._loadMoreBotton);
-        this._loadMoreBotton.addClickEvt(() => {
-          let lastShownTasks = shownTasks;
-          shownTasks = shownTasks + NUMBER_OF_NEXT_TASKS;
+      this._sort.setSortTypeHandler((sortType) => {
+        this._shownTasks = this._NUMBER_ON_START_TASKS;
+        taskListElement.innerHTML = ``;
 
-          const sortedTasks = getSortedTasks(tasks, this._sort.getSortType());
-          sortedTasks.slice(lastShownTasks, shownTasks)
-            .forEach((task) => renderTask(taskListElement, task));
+        const sortedTasks = getSortedTasks(tasks, sortType);
+        sortedTasks.slice(0, this._NUMBER_ON_START_TASKS)
+          .forEach((task) => this._taskController.renderTask(taskListElement, task));
 
-          if (shownTasks >= temprData.length) {
-            this._loadMoreBotton.removeElement();
-          }
-        });
-      };
+        this.renderLoadMoreButton(boardElement, tasks, taskListElement);
+      });
+    }
+  }
 
-      render(siteMainElement, boardComponent);
+  renderLoadMoreButton(boardElement, tasks, taskListElement) {
+    render(boardElement, this._loadMoreBotton);
+    this._loadMoreBotton.addClickEvt(() => {
+      let lastShownTasks = this._shownTasks;
+      this._shownTasks = this._shownTasks + this._NUMBER_OF_NEXT_TASKS;
 
-      if (!tasks.length) {
-        render(boardElement, this._noTask);
-      } else {
-        render(boardElement, this._sort);
-        render(boardElement, this._taskBoard);
+      const sortedTasks = getSortedTasks(tasks, this._sort.getSortType());
+      sortedTasks.slice(lastShownTasks, this._shownTasks)
+        .forEach((task) => this._taskController.renderTask(taskListElement, task));
 
-        const taskListElement = boardElement.querySelector(`.board__tasks`);
-
-        temprData.slice(0, NUMBER_ON_START_TASKS)
-          .forEach((task) => renderTask(taskListElement, task));
-
-        renderLoadMoreButton(taskListElement);
-
-        this._sort.setSortTypeHandler((sortType) => {
-          shownTasks = NUMBER_ON_START_TASKS;
-          taskListElement.innerHTML = ``;
-
-          const sortedTasks = getSortedTasks(tasks, sortType);
-          sortedTasks.slice(0, NUMBER_ON_START_TASKS)
-            .forEach((task) => renderTask(taskListElement, task));
-
-          renderLoadMoreButton(taskListElement);
-        });
+      if (this._shownTasks >= temprData.length) {
+        this._loadMoreBotton.removeElement();
       }
-    };
-
-    const siteMainElement = document.querySelector(`.main`);
-    const siteMenuElement = siteMainElement.querySelector(`.main__control`);
-
-    render(siteMenuElement, this._header);
-    render(siteMainElement, this._filter);
-
-    renderBoard(this._container, temprData);
-
-
+    });
   }
 }
