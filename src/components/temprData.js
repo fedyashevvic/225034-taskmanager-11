@@ -6,7 +6,7 @@ const generateMoki = () => {
     description: descriptions[Math.floor(Math.random() * Math.floor(3))],
     dueDate: Math.random() > 0.5 ? new Date() : null,
     color: colors[Math.floor(Math.random() * Math.floor(5))],
-    isRepeat: Math.random() > 0.5,
+    isRepeat: false,
     isFavorite: Math.random() > 0.5,
     isArchive: Math.random() > 0.5
   };

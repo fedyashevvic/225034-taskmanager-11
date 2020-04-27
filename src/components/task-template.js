@@ -74,4 +74,10 @@ export default class Task extends AbstractComponent {
   addClickEditButton(cb) {
     this.getElement().querySelector(`.card__btn--edit`).addEventListener(`click`, cb);
   }
+  addArchiveClick(cb) {
+    this.getElement().querySelector(`.card__btn--archive`).addEventListener(`click`, cb);
+  }
+  addFavoriteClick(cb) {
+    this.getElement().querySelector(`.card__btn--favorites`).addEventListener(`click`, cb);
+  }
 }

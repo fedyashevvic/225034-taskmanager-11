@@ -1,6 +1,6 @@
 import {MONTH_NAMES, WEEK_DAYS, TEMPLATE_COLORS} from "./const.js";
 import {formatTime} from "./utils.js";
-import AbstractComponent from "./abstract-component.js";
+import AbstractSmartComponent from "./smart-abstract-component.js";
 
 const returnWeekdaysTemplate = (day, isRepeat) => {
   return (
@@ -17,8 +17,11 @@ const returnWeekdaysTemplate = (day, isRepeat) => {
     >`
   );
 };
-const renderWeekdaysTemplate = () => {
+const renderWeekdaysTemplate = (isRepeat) => {
   let currentTemplate = ``;
+  if (!isRepeat) {
+    return currentTemplate;
+  }
   for (const day of WEEK_DAYS) {
     const activeDay = Math.random() > 0.5;
     currentTemplate += returnWeekdaysTemplate(day, activeDay);
@@ -56,13 +59,13 @@ const returnCreateTaskTemplate = (task) => {
 
   const isExpired = dueDate instanceof Date && dueDate < Date.now();
   const isDateShowing = !!dueDate;
-
   const date = isDateShowing ? `${dueDate.getDate()} ${MONTH_NAMES[dueDate.getMonth()]}` : ``;
   const time = isDateShowing ? formatTime(dueDate) : ``;
   const repeatLineClass = isRepeat ? `card--repeat` : ``;
   const deadlineClass = isExpired ? `card--deadline` : ``;
   const colorTemplate = renderColorsTemplate(color);
-  const weekdaysTemplate = renderWeekdaysTemplate();
+  const weekdaysTemplate = renderWeekdaysTemplate(isRepeat);
+  const isSaveBlocked = (isDateShowing && isRepeat);
 
 
   return (
@@ -89,7 +92,7 @@ const returnCreateTaskTemplate = (task) => {
             <div class="card__details">
               <div class="card__dates">
                 <button class="card__date-deadline-toggle" type="button">
-                  date: <span class="card__date-status">yes</span>
+                  date: <span class="card__date-status">${isDateShowing ? `yes` : `no`}</span>
                 </button>
                 ${isDateShowing ?
       `<fieldset class="card__date-deadline">
@@ -106,7 +109,7 @@ const returnCreateTaskTemplate = (task) => {
       : ``}
 
                 <button class="card__repeat-toggle" type="button">
-                  repeat:<span class="card__repeat-status">yes</span>
+                  repeat:<span class="card__repeat-status">${isRepeat ? `yes` : `no`}</span>
                 </button>
 
                 <fieldset class="card__repeat-days">
@@ -126,7 +129,7 @@ const returnCreateTaskTemplate = (task) => {
           </div>
 
           <div class="card__status-btns">
-            <button class="card__save" type="submit">save</button>
+            <button class="card__save" type="submit" ${isSaveBlocked ? `disabled` : ``}>save</button>
             <button class="card__delete" type="button">delete</button>
           </div>
         </div>
@@ -135,15 +138,54 @@ const returnCreateTaskTemplate = (task) => {
   );
 };
 
-export default class TaskEdit extends AbstractComponent {
+export default class TaskEdit extends AbstractSmartComponent {
   constructor(task) {
     super();
     this._task = task;
+
+    this._submitHandler = null;
+    this._isRepeatingTask = null;
+
+    this._subscribeOnEvents();
   }
   getTemplate() {
     return returnCreateTaskTemplate(this._task);
   }
   addClickEditButton(cb) {
-    this.getElement().querySelector(`.card__save`).addEventListener(`click`, cb);
+    this.getElement().querySelector(`form`).addEventListener(`submit`, cb);
+    this._submitHandler = cb;
+  }
+  recoveryListeners() {
+    this.addClickEditButton(this._submitHandler);
+    this._subscribeOnEvents();
+  }
+  rerender() {
+    super.rerender();
+  }
+  _subscribeOnEvents() {
+    const element = this.getElement();
+
+    element.querySelector(`.card__date-deadline-toggle`)
+      .addEventListener(`click`, () => {
+        this._isDateShowing = !this._isDateShowing;
+
+        this.rerender();
+      });
+
+    element.querySelector(`.card__repeat-toggle`)
+      .addEventListener(`click`, () => {
+        this._isRepeatingTask = !this._isRepeatingTask;
+
+        this.rerender();
+      });
+
+    const repeatDays = element.querySelector(`.card__repeat-days`);
+    if (repeatDays) {
+      repeatDays.addEventListener(`change`, (evt) => {
+        this._activeRepeatingDays[evt.target.value] = evt.target.checked;
+
+        this.rerender();
+      });
+    }
   }
 }
