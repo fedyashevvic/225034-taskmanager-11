@@ -9,9 +9,9 @@ import {SortType} from "../components/const.js";
 import TaskController from "./task-controller.js";
 
 
-const renderTasks = (taskListElement, tasks, onDataChange) => {
+const renderTasks = (taskListElement, tasks, onDataChange, onViewChange) => {
   return tasks.map((task) => {
-    const taskController = new TaskController(taskListElement, onDataChange);
+    const taskController = new TaskController(taskListElement, onDataChange, onViewChange);
     taskController.renderTask(task);
     return taskController;
   });
@@ -38,6 +38,7 @@ export default class ControllerComponent {
 
     this._onDataChange = this._onDataChange.bind(this);
     this._onSortTypeChange = this._onSortTypeChange.bind(this);
+    this._onViewChange = this._onViewChange.bind(this);
 
   }
   renderApp(tasks) {
@@ -63,7 +64,7 @@ export default class ControllerComponent {
 
       const taskListElement = boardElement.querySelector(`.board__tasks`);
 
-      const newTasks = renderTasks(taskListElement, tasks.slice(0, this._shownTasks), this._onDataChange);
+      const newTasks = renderTasks(taskListElement, tasks.slice(0, this._shownTasks), this._onDataChange, this._onViewChange);
       this._showedTaskControllers = this._showedTaskControllers.concat(newTasks);
 
       this.renderLoadMoreButton(tasks, taskListElement);
@@ -78,7 +79,7 @@ export default class ControllerComponent {
     this._shownTasks = this._NUMBER_ON_START_TASKS;
     taskListElement.innerHTML = ``;
     const sortedTasks = this.getSortedTasks(this._tasks, sortType);
-    const newTasks = renderTasks(taskListElement, sortedTasks.slice(0, this._shownTasks), this._onDataChange);
+    const newTasks = renderTasks(taskListElement, sortedTasks.slice(0, this._shownTasks), this._onDataChange, this._onViewChange);
     this._showedTaskControllers = newTasks;
 
     this.renderLoadMoreButton(this._tasks, taskListElement);
@@ -94,7 +95,7 @@ export default class ControllerComponent {
       this._shownTasks = this._shownTasks + this._NUMBER_OF_NEXT_TASKS;
 
       const sortedTasks = this.getSortedTasks(tasks, this._sort.getSortType());
-      const newTasks = renderTasks(taskListElement, sortedTasks.slice(lastShownTasks, this._shownTasks), this._onDataChange);
+      const newTasks = renderTasks(taskListElement, sortedTasks.slice(lastShownTasks, this._shownTasks), this._onDataChange, this._onViewChange);
       this._showedTaskControllers = this._showedTaskControllers.concat(newTasks);
 
       if (this._shownTasks >= tasks.length) {
@@ -112,6 +113,9 @@ export default class ControllerComponent {
     this._tasks = [].concat(this._tasks.slice(0, index), newData, this._tasks.slice(index + 1));
 
     this._showedTaskControllers[index].renderTask(this._tasks[index]);
+  }
+  _onViewChange() {
+    this._showedTaskControllers.forEach((it) => it.setDefaultView());
   }
   getSortedTasks(tasks, sortType) {
     let sortedTasks = [];

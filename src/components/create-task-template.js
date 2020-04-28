@@ -17,13 +17,13 @@ const returnWeekdaysTemplate = (day, isRepeat) => {
     >`
   );
 };
-const renderWeekdaysTemplate = (isRepeat) => {
+const renderWeekdaysTemplate = (isRepeat, repeatingDays) => {
   let currentTemplate = ``;
   if (!isRepeat) {
     return currentTemplate;
   }
   for (const day of WEEK_DAYS) {
-    const activeDay = Math.random() > 0.5;
+    const activeDay = repeatingDays.includes(day);
     currentTemplate += returnWeekdaysTemplate(day, activeDay);
   }
   return currentTemplate;
@@ -54,18 +54,22 @@ const renderColorsTemplate = (currentColor) => {
   return currentTemplate;
 };
 
-const returnCreateTaskTemplate = (task) => {
-  const {description, dueDate, color, isRepeat} = task;
+const isRepeating = (repeatingDays) => {
+  return Object.values(repeatingDays).some(Boolean);
+};
+
+const returnCreateTaskTemplate = (task, options) => {
+  const {description, dueDate, color, repeatingDays} = task;
+  const {isDateShowing, isRepeatingTask, activeRepeatingDays} = options;
 
   const isExpired = dueDate instanceof Date && dueDate < Date.now();
-  const isDateShowing = !!dueDate;
-  const date = isDateShowing ? `${dueDate.getDate()} ${MONTH_NAMES[dueDate.getMonth()]}` : ``;
-  const time = isDateShowing ? formatTime(dueDate) : ``;
-  const repeatLineClass = isRepeat ? `card--repeat` : ``;
+  const date = (isDateShowing && dueDate) ? `${dueDate.getDate()} ${MONTH_NAMES[dueDate.getMonth()]}` : ``;
+  const time = (isDateShowing && dueDate) ? formatTime(dueDate) : ``;
+  const repeatLineClass = isRepeatingTask ? `card--repeat` : ``;
   const deadlineClass = isExpired ? `card--deadline` : ``;
   const colorTemplate = renderColorsTemplate(color);
-  const weekdaysTemplate = renderWeekdaysTemplate(isRepeat);
-  const isSaveBlocked = (isDateShowing && isRepeat);
+  const weekdaysTemplate = renderWeekdaysTemplate(isRepeatingTask, repeatingDays);
+  const isSaveBlocked = (isDateShowing && isRepeatingTask) || (isRepeatingTask && !isRepeating(activeRepeatingDays));
 
 
   return (
@@ -102,14 +106,14 @@ const returnCreateTaskTemplate = (task) => {
                       type="text"
                       placeholder=""
                       name="date"
-                      value="${date} ${time}"
+                      value="${date && time ? `${date} ${time}` : ``}"
                     />
                   </label>
                 </fieldset>`
       : ``}
 
                 <button class="card__repeat-toggle" type="button">
-                  repeat:<span class="card__repeat-status">${isRepeat ? `yes` : `no`}</span>
+                  repeat:<span class="card__repeat-status">${isRepeatingTask ? `yes` : `no`}</span>
                 </button>
 
                 <fieldset class="card__repeat-days">
@@ -144,12 +148,18 @@ export default class TaskEdit extends AbstractSmartComponent {
     this._task = task;
 
     this._submitHandler = null;
-    this._isRepeatingTask = null;
+    this._isDateShowing = !!task.dueDate;
+    this._isRepeatingTask = Object.values(task.repeatingDays).some(Boolean);
+    this._activeRepeatingDays = Object.assign({}, task.repeatingDays);
 
     this._subscribeOnEvents();
   }
   getTemplate() {
-    return returnCreateTaskTemplate(this._task);
+    return returnCreateTaskTemplate(this._task, {
+      isDateShowing: this._isDateShowing,
+      isRepeatingTask: this._isRepeatingTask,
+      activeRepeatingDays: this._activeRepeatingDays,
+    });
   }
   addClickEditButton(cb) {
     this.getElement().querySelector(`form`).addEventListener(`submit`, cb);
@@ -183,9 +193,17 @@ export default class TaskEdit extends AbstractSmartComponent {
     if (repeatDays) {
       repeatDays.addEventListener(`change`, (evt) => {
         this._activeRepeatingDays[evt.target.value] = evt.target.checked;
-
         this.rerender();
       });
     }
+  }
+  reset() {
+    const task = this._task;
+
+    this._isDateShowing = !!task.dueDate;
+    this._isRepeatingTask = Object.values(task.repeatingDays).some(Boolean);
+    this._activeRepeatingDays = Object.assign({}, task.repeatingDays);
+
+    this.rerender();
   }
 }

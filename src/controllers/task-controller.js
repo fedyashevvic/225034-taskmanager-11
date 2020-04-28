@@ -3,10 +3,16 @@ import {render, replace} from "../components/render.js";
 import Task from "../components/task-template.js";
 import TaskEdit from "../components/create-task-template.js";
 
+const Mode = {
+  default: `default`,
+  edit: `edit`,
+};
 export default class TaskController {
-  constructor(container, onDataChange) {
+  constructor(container, onDataChange, onViewChange) {
     this._container = container;
     this._onDataChange = onDataChange;
+    this._onViewChange = onViewChange;
+    this._mode = Mode.default;
     this._taskComponent = null;
     this._taskEditComponent = null;
   }
@@ -16,18 +22,6 @@ export default class TaskController {
 
     this._taskComponent = new Task(task);
     this._taskEditComponent = new TaskEdit(task);
-
-
-    const taskToEditHandler = () => {
-      replace(this._taskEditComponent, this._taskComponent);
-      const closeOnEsc = (evt) => {
-        if (evt.key === Key.ESC) {
-          editToTaskHandler();
-          window.removeEventListener(`keydown`, closeOnEsc);
-        }
-      };
-      window.addEventListener(`keydown`, closeOnEsc);
-    };
 
     this._taskComponent.addArchiveClick(() => {
       this._onDataChange(task, Object.assign({}, task, {
@@ -39,12 +33,13 @@ export default class TaskController {
         isFavorite: !task.isFavorite,
       }));
     });
-    const editToTaskHandler = () => {
-      replace(this._taskComponent, this._taskEditComponent);
-    };
 
-    this._taskComponent.addClickEditButton(taskToEditHandler);
-    this._taskEditComponent.addClickEditButton(editToTaskHandler);
+    this._taskComponent.addClickEditButton(() => {
+      this._taskToEditHandler();
+    });
+    this._taskEditComponent.addClickEditButton(() => {
+      this._editToTaskHandler();
+    });
 
     if (oldTaskEditComponent && oldTaskComponent) {
       replace(this._taskComponent, oldTaskComponent);
@@ -52,5 +47,36 @@ export default class TaskController {
     } else {
       render(this._container, this._taskComponent);
     }
+  }
+  setDefaultView() {
+    if (this._mode === Mode.edit) {
+      this._editToTaskHandler();
+      this._mode = Mode.default;
+    }
+  }
+
+  _editToTaskHandler() {
+    const parentElement = this._taskEditComponent.getElement().parentElement;
+    const newElement = this._taskComponent.getElement();
+    const oldElement = this._taskEditComponent.getElement();
+
+    const isExistElements = !!(parentElement && newElement && oldElement);
+
+    if (isExistElements && parentElement.contains(oldElement)) {
+      parentElement.replaceChild(newElement, oldElement);
+    }
+  }
+
+  _taskToEditHandler() {
+    this._onViewChange();
+    replace(this._taskEditComponent, this._taskComponent);
+    this._mode = Mode.edit;
+    const closeOnEsc = (evt) => {
+      if (evt.key === Key.ESC) {
+        this._editToTaskHandler();
+        window.removeEventListener(`keydown`, closeOnEsc);
+      }
+    };
+    window.addEventListener(`keydown`, closeOnEsc);
   }
 }

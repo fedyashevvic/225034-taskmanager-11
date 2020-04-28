@@ -2,8 +2,8 @@ import {MONTH_NAMES} from "./const.js";
 import {formatTime} from "./utils.js";
 import AbstractComponent from "./abstract-component.js";
 
-const returnTaskTemplate = (task) => {
-  const {description, dueDate, color, isFavorite, isArchive, isRepeat} = task;
+const returnTaskTemplate = (task, isRepeatingTask) => {
+  const {description, dueDate, color, isFavorite, isArchive} = task;
 
   const isExpired = dueDate instanceof Date && dueDate < Date.now();
   const isDateShowing = !!dueDate;
@@ -13,7 +13,7 @@ const returnTaskTemplate = (task) => {
 
   const favoriteButtonClass = isFavorite ? `` : `card__btn--disabled`;
   const archiveButtonClass = isArchive ? `` : `card__btn--disabled`;
-  const repeatLineClass = isRepeat ? `card--repeat` : ``;
+  const repeatLineClass = isRepeatingTask ? `card--repeat` : ``;
   const deadlineClass = isExpired ? `card--deadline` : ``;
 
   return (
@@ -67,9 +67,10 @@ export default class Task extends AbstractComponent {
   constructor(task) {
     super();
     this._task = task;
+    this._isRepeatingTask = Object.values(task.repeatingDays).some(Boolean);
   }
   getTemplate() {
-    return returnTaskTemplate(this._task);
+    return returnTaskTemplate(this._task, this._isRepeatingTask);
   }
   addClickEditButton(cb) {
     this.getElement().querySelector(`.card__btn--edit`).addEventListener(`click`, cb);
