@@ -16,6 +16,7 @@ const returnRepeatingDays = () => {
 
 const generateMoki = () => {
   return {
+    id: String(parseInt(Date.now() + Math.random, 10)),
     description: descriptions[Math.floor(Math.random() * Math.floor(3))],
     dueDate: Math.random() > 0.5 ? new Date() : null,
     color: colors[Math.floor(Math.random() * Math.floor(5))],

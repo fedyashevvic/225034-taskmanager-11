@@ -8,7 +8,6 @@ import {render} from "../components/render.js";
 import {SortType} from "../components/const.js";
 import TaskController from "./task-controller.js";
 
-
 const renderTasks = (taskListElement, tasks, onDataChange, onViewChange) => {
   return tasks.map((task) => {
     const taskController = new TaskController(taskListElement, onDataChange, onViewChange);
@@ -18,10 +17,10 @@ const renderTasks = (taskListElement, tasks, onDataChange, onViewChange) => {
 };
 
 export default class ControllerComponent {
-  constructor(container) {
+  constructor(container, taskModel) {
     this._container = container;
+    this._taskModel = taskModel;
 
-    this._tasks = [];
     this._showedTaskControllers = [];
     this._NUMBER_ON_START_TASKS = 8;
     this._NUMBER_OF_NEXT_TASKS = 8;
@@ -41,13 +40,13 @@ export default class ControllerComponent {
     this._onViewChange = this._onViewChange.bind(this);
 
   }
-  renderApp(tasks) {
-    this._tasks = tasks;
+  renderApp() {
+    const tasks = this._taskModel.getTasks();
 
     render(this._siteMenuElement, this._header);
     render(this._siteMainElement, this._filter);
 
-    this.renderBoard(this._container, this._tasks);
+    this.renderBoard(this._container, tasks);
   }
 
 
@@ -76,13 +75,14 @@ export default class ControllerComponent {
   }
 
   _onSortTypeChange(sortType, taskListElement) {
+    const tasks = this._taskModel.getTasks();
     this._shownTasks = this._NUMBER_ON_START_TASKS;
     taskListElement.innerHTML = ``;
-    const sortedTasks = this.getSortedTasks(this._tasks, sortType);
+    const sortedTasks = this.getSortedTasks(tasks, sortType);
     const newTasks = renderTasks(taskListElement, sortedTasks.slice(0, this._shownTasks), this._onDataChange, this._onViewChange);
     this._showedTaskControllers = newTasks;
 
-    this.renderLoadMoreButton(this._tasks, taskListElement);
+    this.renderLoadMoreButton(tasks, taskListElement);
   }
 
   renderLoadMoreButton(tasks, taskListElement) {
@@ -104,15 +104,12 @@ export default class ControllerComponent {
     });
   }
   _onDataChange(oldData, newData) {
-    const index = this._tasks.findIndex((it) => it === oldData);
+    const ifSuccess = this._taskModel.updateTask(oldData.id, newData);
+    const index = this._taskModel.getTasks().findIndex((it) => it.id === oldData.id);
 
-    if (index === -1) {
-      return;
+    if (ifSuccess && index) {
+      this._showedTaskControllers[index].renderTask(newData);
     }
-
-    this._tasks = [].concat(this._tasks.slice(0, index), newData, this._tasks.slice(index + 1));
-
-    this._showedTaskControllers[index].renderTask(this._tasks[index]);
   }
   _onViewChange() {
     this._showedTaskControllers.forEach((it) => it.setDefaultView());
