@@ -35,5 +35,7 @@ const render = (container, component, place = RenderPosition.BEFOREEND) => {
 const Key = {
   ESC: `Escape`,
 };
-
-export {formatTime, createElement, render, Key};
+const getTasksByFilter = (tasks) => {
+  return tasks;
+};
+export {formatTime, createElement, render, Key, getTasksByFilter};
