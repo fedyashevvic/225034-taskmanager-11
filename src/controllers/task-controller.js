@@ -24,12 +24,12 @@ export default class TaskController {
     this._taskEditComponent = new TaskEdit(task);
 
     this._taskComponent.addArchiveClick(() => {
-      this._onDataChange(task, Object.assign({}, task, {
+      this._onDataChange(this, task, Object.assign({}, task, {
         isArchive: !task.isArchive,
       }));
     });
     this._taskComponent.addFavoriteClick(() => {
-      this._onDataChange(task, Object.assign({}, task, {
+      this._onDataChange(this, task, Object.assign({}, task, {
         isFavorite: !task.isFavorite,
       }));
     });

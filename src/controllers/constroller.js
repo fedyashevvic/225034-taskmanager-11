@@ -103,12 +103,11 @@ export default class ControllerComponent {
       }
     });
   }
-  _onDataChange(oldData, newData) {
+  _onDataChange(controller, oldData, newData) {
     const ifSuccess = this._taskModel.updateTask(oldData.id, newData);
-    const index = this._taskModel.getTasks().findIndex((it) => it.id === oldData.id);
 
-    if (ifSuccess && index) {
-      this._showedTaskControllers[index].renderTask(newData);
+    if (ifSuccess) {
+      controller.renderTask(newData);
     }
   }
   _onViewChange() {

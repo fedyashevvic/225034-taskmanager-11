@@ -15,12 +15,14 @@ export default class Task {
     const index = this._tasks.findIndex((it) => it.id === id);
 
     if (index === -1) {
-      return;
+      return false;
     }
 
     this._tasks = [].concat(this._tasks.slice(0, index), task, this._tasks.slice(index + 1));
 
     this._callHandlers(this._dataChangeHandlers);
+
+    return true;
   }
   setDataChangeHandlers(handlers) {
     this._dataChangeHandlers.push(handlers);
