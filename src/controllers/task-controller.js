@@ -1,5 +1,5 @@
-import {Key} from "../components/utils.js";
-import {render, replace} from "../components/render.js";
+import {render, replace} from "../utils/render.js";
+import {Key} from "../utils/utils.js";
 import Task from "../components/task-template.js";
 import TaskEdit from "../components/create-task-template.js";
 

@@ -1,7 +1,7 @@
-import {FilterType} from "../components/const.js";
+import {FilterType} from "../utils/const.js";
 import FilterComponent from "../components/filters-template.js";
-import {getTasksByFilter} from "../components/utils.js";
-import {render, replace} from "../components/render.js";
+import {getTasksByFilter} from "../utils/utils.js";
+import {render, replace} from "../utils/render.js";
 
 export default class FilterController {
   constructor(container, dataModel) {
@@ -34,7 +34,6 @@ export default class FilterController {
     }
   }
   _onFilterChange(filterType) {
-    this._dataModel.setFilter(filterType);
     this._filterType = filterType;
   }
   _onDataChange() {

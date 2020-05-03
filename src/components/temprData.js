@@ -1,4 +1,4 @@
-import {WEEK_DAYS} from "./const.js";
+import {WEEK_DAYS} from "../utils/const.js";
 
 const descriptions = [`Изучить теорию`, `Сделать домашку`, `Пройти интенсив на соточку`];
 const colors = [`black`, `yellow`, `blue`, `green`, `pink`];

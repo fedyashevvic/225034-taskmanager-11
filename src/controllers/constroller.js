@@ -4,8 +4,8 @@ import Filter from "../components/filters-template.js";
 import TaskBoard from "../components/board-tasks-template.js";
 import MoreButton from "../components/load-more-template.js";
 import NoTask from "../components/no-task-template.js";
-import {render} from "../components/render.js";
-import {SortType} from "../components/const.js";
+import {render} from "../utils/render.js";
+import {SortType} from "../utils/const.js";
 import TaskController from "./task-controller.js";
 
 const renderTasks = (taskListElement, tasks, onDataChange, onViewChange) => {

@@ -1,20 +1,19 @@
 import AbstractComponent from "./abstract-component.js";
 
-const filters = {
-  titles: [`All`, `Overdue`, `Today`, `Favorites`, `Repeating`, `Archive`],
-  returnCount: () => {
-    return Math.floor(Math.random() * Math.floor(10));
-  }
+const FILTER_PREFIX = `filter__`;
+const getFilterById = (id) => {
+  return id.substring(FILTER_PREFIX.length);
 };
 
-const returnFiltersItem = (title, count) => {
+const returnFiltersItem = (filter, isChecked) => {
+  const {title, count} = filter;
   return (
     `<input
       type="radio"
       id="filter__${title.toLowerCase()}"
       class="filter__input visually-hidden"
       name="filter"
-      ${title === `All` ? `checked` : ``}
+      ${isChecked ? `checked` : ``}
       ${count > 0 ? `` : `disabled`}
     />
     <label for="filter__${title.toLowerCase()}" class="filter__label">
@@ -22,15 +21,8 @@ const returnFiltersItem = (title, count) => {
     >`
   );
 };
-const renderFilterItems = () => {
-  let currentTemplate = ``;
-  for (const title of filters.titles) {
-    currentTemplate += returnFiltersItem(title, filters.returnCount());
-  }
-  return currentTemplate;
-};
-export const returnFiltersTemplate = () => {
-  const template = renderFilterItems();
+export const returnFiltersTemplate = (filters) => {
+  const template = filters.map((it) => returnFiltersItem(it, it.checked)).join(`\n`);
   return (
     `<section class="main__filter filter container">
     ${template}
@@ -39,8 +31,19 @@ export const returnFiltersTemplate = () => {
 };
 
 export default class Filter extends AbstractComponent {
+  constructor(filters) {
+    super();
+
+    this._filters = filters;
+  }
   getTemplate() {
-    return returnFiltersTemplate();
+    return returnFiltersTemplate(this._filters);
+  }
+  setFilterChangeHandler(handler) {
+    this.getElement().addEventListener(`change`, (evt) => {
+      const targetId = getFilterById(evt.targer.id);
+      handler(targetId);
+    });
   }
 }
 

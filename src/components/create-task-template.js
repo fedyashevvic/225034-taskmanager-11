@@ -1,5 +1,5 @@
-import {MONTH_NAMES, WEEK_DAYS, TEMPLATE_COLORS} from "./const.js";
-import {formatTime} from "./utils.js";
+import {MONTH_NAMES, WEEK_DAYS, TEMPLATE_COLORS} from "../utils/const.js";
+import {formatTime} from "../utils/utils.js";
 import AbstractSmartComponent from "./smart-abstract-component.js";
 
 const returnWeekdaysTemplate = (day, isRepeat) => {

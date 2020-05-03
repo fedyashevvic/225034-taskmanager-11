@@ -1,5 +1,5 @@
-import {MONTH_NAMES} from "./const.js";
-import {formatTime} from "./utils.js";
+import {MONTH_NAMES} from "../utils/const.js";
+import {formatTime} from "../utils/utils.js";
 import AbstractComponent from "./abstract-component.js";
 
 const returnTaskTemplate = (task, isRepeatingTask) => {
