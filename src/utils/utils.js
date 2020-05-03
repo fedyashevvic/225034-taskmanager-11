@@ -38,4 +38,5 @@ const Key = {
 const getTasksByFilter = (tasks) => {
   return tasks;
 };
+
 export {formatTime, createElement, render, Key, getTasksByFilter};
